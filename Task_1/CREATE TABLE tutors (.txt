@@ -1,0 +1,38 @@
+CREATE TABLE tutors (
+    tutor_id SERIAL PRIMARY KEY,
+    iin VARCHAR(12) NOT NULL,
+    tutor_name VARCHAR(30) NOT NULL,
+    tutor_phone VARCHAR(12) NOT NULL,
+    shift VARCHAR(20) NOT NULL,
+    hours DECIMAL(5,2) NOT NULL
+);
+
+CREATE TABLE courses (
+    course_id SERIAL PRIMARY KEY,
+    name VARCHAR(30) NOT NULL,
+    duration VARCHAR(30) NOT NULL,
+    tutor_id INT REFERENCES tutors(tutor_id)
+);
+
+CREATE TABLE students (
+    student_id SERIAL PRIMARY KEY,
+    iin VARCHAR(12) NOT NULL,
+    student_name VARCHAR(30) NOT NULL,
+    student_phone VARCHAR(12) NOT NULL,
+    hours DECIMAL(5,2) NOT NULL
+);
+
+CREATE TABLE student_courses (
+    student_id INT REFERENCES students(student_id),
+    course_id INT REFERENCES courses(course_id),
+    PRIMARY KEY (student_id, course_id)
+);
+
+CREATE TABLE pricing (
+    pricing_id SERIAL PRIMARY KEY,
+    course_id INT REFERENCES courses(course_id),
+    tutor_id INT REFERENCES tutors(tutor_id),
+    course_price DECIMAL(7,2) NOT NULL,
+    tax_fee VARCHAR(20) NOT NULL,
+    hours DECIMAL(5,2) NOT NULL
+);
