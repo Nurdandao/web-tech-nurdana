@@ -1,4 +1,4 @@
-CREATE TABLE tutors (
+CREATE TABLE IF NOT EXISTS tutors (
     tutor_id SERIAL PRIMARY KEY,
     iin VARCHAR(12) NOT NULL,
     tutor_name VARCHAR(30) NOT NULL,
@@ -7,14 +7,14 @@ CREATE TABLE tutors (
     hours DECIMAL(5,2) NOT NULL
 );
 
-CREATE TABLE courses (
+CREATE TABLE IF NOT EXISTS courses (
     course_id SERIAL PRIMARY KEY,
     name VARCHAR(30) NOT NULL,
     duration VARCHAR(30) NOT NULL,
     tutor_id INT REFERENCES tutors(tutor_id)
 );
 
-CREATE TABLE students (
+CREATE TABLE IF NOT EXISTS students (
     student_id SERIAL PRIMARY KEY,
     iin VARCHAR(12) NOT NULL,
     student_name VARCHAR(30) NOT NULL,
@@ -22,13 +22,13 @@ CREATE TABLE students (
     hours DECIMAL(5,2) NOT NULL
 );
 
-CREATE TABLE student_courses (
+CREATE TABLE IF NOT EXISTS student_courses (
     student_id INT REFERENCES students(student_id),
     course_id INT REFERENCES courses(course_id),
     PRIMARY KEY (student_id, course_id)
 );
 
-CREATE TABLE pricing (
+CREATE TABLE IF NOT EXISTS pricing (
     pricing_id SERIAL PRIMARY KEY,
     course_id INT REFERENCES courses(course_id),
     tutor_id INT REFERENCES tutors(tutor_id),
