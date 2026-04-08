@@ -1,111 +1,102 @@
-CREATE TABLE theaters (
-    theater_id SERIAL PRIMARY KEY,
-    name VARCHAR(50) NOT NULL,
-    address VARCHAR(100) NOT NULL,
-    rating DECIMAL(2,1)
-);
 
-CREATE TABLE customers (
-    customer_id SERIAL PRIMARY KEY,
-    name VARCHAR(50) NOT NULL,
-    age INT NOT NULL,
-    phone_number VARCHAR(12) NOT NULL,
-    credit_card VARCHAR(12)
-);
+--ALTER TABLE Members
+--ALTER COLUMN username SET NOT NULL;
 
-CREATE TABLE genres (
-    genre_id SERIAL PRIMARY KEY,
-    name VARCHAR(30) NOT NULL
-);
+--ALTER TABLE Members
+--ALTER COLUMN email SET NOT NULL;
 
-CREATE TABLE seats (
-    seat_id SERIAL PRIMARY KEY,
-    hall_number INT NOT NULL UNIQUE,
-    hall_row INT NOT NULL UNIQUE,
-    seat_number INT NOT NULL UNIQUE,
-    type_of_seat ENUM ('Normal', 'Comfort', 'Preferential') NOT NULL
-);
+--ALTER TABLE Members
+--ALTER COLUMN is_active SET DEFAULT true;
 
-CREATE TABLE films (
-    film_id SERIAL PRIMARY KEY,
-    name VARCHAR(40) NOT NULL,
-    duration INTERVAL NOT NULL,
-    release_date DATE NOT NULL,
-    age_restriction VARCHAR(5) NOT NULL,
-    rating DECIMAL(2,1) DEFAULT 0 NOT NULL,
-    description TEXT NOT NULL
-);
+--ALTER TABLE Members
+--ADD CONSTRAINT members_username_unique UNIQUE (username);
 
-CREATE TABLE film_genres (
-    film_id INT REFERENCES films(film_id) ON DELETE CASCADE ,
-    genre_id INT REFERENCES genres(genre_id) ON DELETE CASCADE,
-    PRIMARY KEY (film_id, genre_id)
-);
+--ALTER TABLE Members
+--ADD CONSTRAINT members_email_unique UNIQUE (email);
 
-CREATE TABLE staff (
-    staff_id SERIAL PRIMARY KEY,
-    name VARCHAR(50) NOT NULL,
-    phone VARCHAR(15) NOT NULL,
-    age INT NOT NULL,
-    job VARCHAR(30) NOT NULL,
-    shift VARCHAR(20) NOT NULL,
-    salary INT NOT NULL,
-    theater_id INT NOT NULL REFERENCES theaters(theater_id)
-);
+--ALTER TABLE Books
+--ALTER COLUMN author SET NOT NULL;
 
-CREATE TABLE screenings (
-    screening_id SERIAL PRIMARY KEY,
-    film_id INT NOT NULL REFERENCES films(film_id),
-    theater_id INT NOT NULL REFERENCES theaters(theater_id),
-    hall_number INT NOT NULL,
-    screening_date DATE NOT NULL,
-    start_time TIME NOT NULL,
-    end_time TIME NOT NULL,
-    status ENUM ('Scheduled', 'Cancelled', 'Postponed') NOT NULL
-);
+--ALTER TABLE Books
+--ADD CONSTRAINT books_year_check CHECK (year_pub >= 0);
 
-CREATE TABLE staff_screenings (
-    staff_id INT REFERENCES staff(staff_id) ON DELETE CASCADE,
-    screening_id INT REFERENCES screenings(screening_id) ON DELETE CASCADE ,
-    PRIMARY KEY (staff_id, screening_id)
-);
+--ALTER TABLE Books
+--ADD COLUMN condition TEXT;
 
-CREATE TABLE reservations (
-    reservation_id SERIAL PRIMARY KEY,
-    customer_id INT NOT NULL REFERENCES customers(customer_id),
-    screening_id INT NOT NULL REFERENCES screenings(screening_id),
-    seats_count INT NOT NULL,
-    status ENUM ('Pending', 'Confirmed', 'Cancelled') NOT NULL,
-    operation_type ENUM ('Purchased', 'Refund', 'Failure') NOT NULL
-);
+--ALTER TABLE Books
+--ALTER COLUMN condition TYPE VARCHAR(30);
 
-CREATE TABLE reservation_seats (
-    reservation_id INT REFERENCES reservations(reservation_id) ON DELETE CASCADE PRIMARY KEY,
-    seat_id INT REFERENCES seats(seat_id) PRIMARY KEY
-);
+--ALTER TABLE Books
+--ALTER COLUMN condition SET DEFAULT 'good';
 
-CREATE TABLE pricing (
-    price_id SERIAL PRIMARY KEY,
-    theater_id INT NOT NULL REFERENCES theaters(theater_id) UNIQUE,
-    type_of_seat ENUM ('Normal', 'Comfort', 'Preferential') NOT NULL UNIQUE,
-    adult_price DECIMAL(6,2) NOT NULL,
-    child_price DECIMAL(6,2) NOT NULL,
-    preferential_price DECIMAL(6,2) NOT NULL
-);
+--ALTER TABLE Books
+--ALTER COLUMN condition SET NOT NULL;
 
-ALTER TABLE members 
-ADD CONSTRAINT username UNIQUE (username),
-ADD CONSTRAINT email UNIQUE (username),
-ALTER COLUMN username SET NOT NULL,
-ALTER COLUMN email SET NOT NULL,
-ALTER COLUMN is_active SET DEFAULT TRUE;
+--ALTER TABLE Books
+--ADD CONSTRAINT books_owner_fk
+--FOREIGN KEY (owner_id) REFERENCES Members(id);
 
-ALTER TABLE books
-ALTER COLUMN author SET NOT NULL,
-ADD CONSTRAINT year_pub CHECK (year_pub >= 0),
-ADD COLUMN condition VARCHAR(30) NOT NULL DEFAULT 'good',
-ADD CONSTRAINT (owner_id) REFERENCES Members(id);
+--ALTER TABLE Exchanges
+--ALTER COLUMN exchange_date SET NOT NULL;
 
-ALTER TABLE exchanges 
-ALTER COLUMN exchange_date SET NOT NULL,
-ADD CONSTRAINTS 
+--ALTER TABLE Exchanges
+--ADD CONSTRAINT exchanges_exchange_date_check
+--CHECK (exchange_date >= DATE '2026-01-01');
+
+--ALTER TABLE Exchanges
+--ADD CONSTRAINT exchanges_return_date_check
+--CHECK (return_date >= DATE '2026-01-01');
+
+--ALTER TABLE Exchanges
+--ADD COLUMN status VARCHAR(20);
+
+--ALTER TABLE Exchanges
+--ALTER COLUMN status SET DEFAULT 'pending';
+
+--ALTER TABLE Exchanges
+--ADD CONSTRAINT exchanges_book_fk
+--FOREIGN KEY (book_id) REFERENCES Books(id);
+
+--ALTER TABLE Exchanges
+--ADD CONSTRAINT exchanges_borrower_fk
+--FOREIGN KEY (borrower_id) REFERENCES Members(id);
+
+--ALTER TABLE Reviews
+--ALTER COLUMN review_text SET NOT NULL;
+
+--ALTER TABLE Reviews
+--ADD CONSTRAINT reviews_rating_check
+--CHECK (rating BETWEEN 1 AND 5);
+
+--ALTER TABLE Reviews
+--ADD CONSTRAINT reviews_book_fk
+--FOREIGN KEY (book_id) REFERENCES Books(id);
+
+--ALTER TABLE Reviews
+--ADD CONSTRAINT reviews_member_fk
+--FOREIGN KEY (member_id) REFERENCES Members(id);
+
+--INSERT INTO Members (username, email, joined_date, is_active)
+--VALUES
+--('m0nesy', 'monesy11@mail.com', '2026-01-10', true),
+--('kyousuke', 'kyousuke@mail.com', '2026-02-15', true),
+--('donkk', 'donk25@mail.com', '2026-03-01', true);
+
+--INSERT INTO Books (title, author, year_pub, owner_id, condition)
+--VALUES
+--('Clean Code', 'Robert Martin', 2020, 1, 'good'),
+--('Atomic Habits', 'James Clear', 2018, 2, 'excellent'),
+--('Deep Work', 'Cal Newport', 2016, 3, 'fair');
+	
+--INSERT INTO Exchanges (book_id, borrower_id, exchange_date, return_date, status)
+--VALUES
+--(1, 2, '2026-02-01', '2026-02-10', 'completed'),
+--(2, 3, '2026-03-01', '2026-03-10', 'pending');
+
+--INSERT INTO Reviews (book_id, member_id, rating, review_text, created_at)
+--VALUES
+--(1, 2, 5, 'Great book!', '2026-02-11'),
+--(2, 3, 4, 'Nice read', '2026-03-11');
+
+
+
