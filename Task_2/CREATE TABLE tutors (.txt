@@ -1,0 +1,111 @@
+CREATE TABLE theaters (
+    theater_id SERIAL PRIMARY KEY,
+    name VARCHAR(50) NOT NULL,
+    address VARCHAR(100) NOT NULL,
+    rating DECIMAL(2,1)
+);
+
+CREATE TABLE customers (
+    customer_id SERIAL PRIMARY KEY,
+    name VARCHAR(50) NOT NULL,
+    age INT NOT NULL,
+    phone_number VARCHAR(12) NOT NULL,
+    credit_card VARCHAR(12)
+);
+
+CREATE TABLE genres (
+    genre_id SERIAL PRIMARY KEY,
+    name VARCHAR(30) NOT NULL
+);
+
+CREATE TABLE seats (
+    seat_id SERIAL PRIMARY KEY,
+    hall_number INT NOT NULL UNIQUE,
+    hall_row INT NOT NULL UNIQUE,
+    seat_number INT NOT NULL UNIQUE,
+    type_of_seat ENUM ('Normal', 'Comfort', 'Preferential') NOT NULL
+);
+
+CREATE TABLE films (
+    film_id SERIAL PRIMARY KEY,
+    name VARCHAR(40) NOT NULL,
+    duration INTERVAL NOT NULL,
+    release_date DATE NOT NULL,
+    age_restriction VARCHAR(5) NOT NULL,
+    rating DECIMAL(2,1) DEFAULT 0 NOT NULL,
+    description TEXT NOT NULL
+);
+
+CREATE TABLE film_genres (
+    film_id INT REFERENCES films(film_id) ON DELETE CASCADE ,
+    genre_id INT REFERENCES genres(genre_id) ON DELETE CASCADE,
+    PRIMARY KEY (film_id, genre_id)
+);
+
+CREATE TABLE staff (
+    staff_id SERIAL PRIMARY KEY,
+    name VARCHAR(50) NOT NULL,
+    phone VARCHAR(15) NOT NULL,
+    age INT NOT NULL,
+    job VARCHAR(30) NOT NULL,
+    shift VARCHAR(20) NOT NULL,
+    salary INT NOT NULL,
+    theater_id INT NOT NULL REFERENCES theaters(theater_id)
+);
+
+CREATE TABLE screenings (
+    screening_id SERIAL PRIMARY KEY,
+    film_id INT NOT NULL REFERENCES films(film_id),
+    theater_id INT NOT NULL REFERENCES theaters(theater_id),
+    hall_number INT NOT NULL,
+    screening_date DATE NOT NULL,
+    start_time TIME NOT NULL,
+    end_time TIME NOT NULL,
+    status ENUM ('Scheduled', 'Cancelled', 'Postponed') NOT NULL
+);
+
+CREATE TABLE staff_screenings (
+    staff_id INT REFERENCES staff(staff_id) ON DELETE CASCADE,
+    screening_id INT REFERENCES screenings(screening_id) ON DELETE CASCADE ,
+    PRIMARY KEY (staff_id, screening_id)
+);
+
+CREATE TABLE reservations (
+    reservation_id SERIAL PRIMARY KEY,
+    customer_id INT NOT NULL REFERENCES customers(customer_id),
+    screening_id INT NOT NULL REFERENCES screenings(screening_id),
+    seats_count INT NOT NULL,
+    status ENUM ('Pending', 'Confirmed', 'Cancelled') NOT NULL,
+    operation_type ENUM ('Purchased', 'Refund', 'Failure') NOT NULL
+);
+
+CREATE TABLE reservation_seats (
+    reservation_id INT REFERENCES reservations(reservation_id) ON DELETE CASCADE PRIMARY KEY,
+    seat_id INT REFERENCES seats(seat_id) PRIMARY KEY
+);
+
+CREATE TABLE pricing (
+    price_id SERIAL PRIMARY KEY,
+    theater_id INT NOT NULL REFERENCES theaters(theater_id) UNIQUE,
+    type_of_seat ENUM ('Normal', 'Comfort', 'Preferential') NOT NULL UNIQUE,
+    adult_price DECIMAL(6,2) NOT NULL,
+    child_price DECIMAL(6,2) NOT NULL,
+    preferential_price DECIMAL(6,2) NOT NULL
+);
+
+ALTER TABLE members 
+ADD CONSTRAINT username UNIQUE (username),
+ADD CONSTRAINT email UNIQUE (username),
+ALTER COLUMN username SET NOT NULL,
+ALTER COLUMN email SET NOT NULL,
+ALTER COLUMN is_active SET DEFAULT TRUE;
+
+ALTER TABLE books
+ALTER COLUMN author SET NOT NULL,
+ADD CONSTRAINT year_pub CHECK (year_pub >= 0),
+ADD COLUMN condition VARCHAR(30) NOT NULL DEFAULT 'good',
+ADD CONSTRAINT (owner_id) REFERENCES Members(id);
+
+ALTER TABLE exchanges 
+ALTER COLUMN exchange_date SET NOT NULL,
+ADD CONSTRAINTS 
