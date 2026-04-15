@@ -1,0 +1,35 @@
+create database if not exists movie_theater_ms;
+
+create table if not exists theaters(
+	theater_id SERIAL primary key,
+	name VARCHAR(50) not null,
+	address VARCHAR(100) not null,
+	rating DECIMAL(2,1) default 0
+);
+
+create table if not exists genres(
+	genre_id SERIAL primary key,
+	name VARCHAR(30) not null
+);
+
+create table if not exists films(
+	film_id SERIAL primary key,
+	name VARCHAR(100) not null,
+	duration TIMESTAMP not null,
+	genre_id foreign key references genres (genre_id) films (genre_id),
+	release_date DATE not null CHECK(release_date > '01.01.2026'),
+	age_restriction VARCHAR(3) not null,
+	rating DECIMAL(2,1) not null default 0,
+	description TEXT not null
+);
+
+create table if not exists staff(
+	staff_id SERIAL primary key,
+	name VARCHAR(50) not null,
+	number VARCHAR(12) not null,
+	age INT not null,
+	job_position VARCHAR(50) not null,
+	shift VARCHAR(20) not null,
+	salary VARCHAR(10) not null,
+	theater_id INT not null foreign key references Theaters(theater_id) Staff(theater_id)
+);
